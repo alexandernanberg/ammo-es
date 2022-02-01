@@ -1,0 +1,9 @@
+{
+  "extends": ["alexandernanberg/base"],
+  "env": {
+    "worker": true
+  },
+  "globals": {
+    "Ammo": true
+  }
+}

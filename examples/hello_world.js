@@ -2,7 +2,7 @@ Ammo().then(function (Ammo) {
   // Adapted from HelloWorld.cpp, Copyright (c) 2003-2007 Erwin Coumans  http://continuousphysics.com/Bullet/
 
   function main() {
-    var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration(),
+    const collisionConfiguration = new Ammo.btDefaultCollisionConfiguration(),
       dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration),
       overlappingPairCache = new Ammo.btDbvtBroadphase(),
       solver = new Ammo.btSequentialImpulseConstraintSolver(),
@@ -14,7 +14,7 @@ Ammo().then(function (Ammo) {
       );
     dynamicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
 
-    var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50)),
+    const groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50)),
       bodies = [],
       groundTransform = new Ammo.btTransform();
 
@@ -22,13 +22,13 @@ Ammo().then(function (Ammo) {
     groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
 
     (function () {
-      var mass = 0,
+      const mass = 0,
         isDynamic = mass !== 0,
         localInertia = new Ammo.btVector3(0, 0, 0);
 
       if (isDynamic) groundShape.calculateLocalInertia(mass, localInertia);
 
-      var myMotionState = new Ammo.btDefaultMotionState(groundTransform),
+      const myMotionState = new Ammo.btDefaultMotionState(groundTransform),
         rbInfo = new Ammo.btRigidBodyConstructionInfo(
           mass,
           myMotionState,
@@ -42,12 +42,12 @@ Ammo().then(function (Ammo) {
     })();
 
     (function () {
-      var colShape = new Ammo.btSphereShape(1),
+      const colShape = new Ammo.btSphereShape(1),
         startTransform = new Ammo.btTransform();
 
       startTransform.setIdentity();
 
-      var mass = 1,
+      const mass = 1,
         isDynamic = mass !== 0,
         localInertia = new Ammo.btVector3(0, 0, 0);
 
@@ -55,7 +55,7 @@ Ammo().then(function (Ammo) {
 
       startTransform.setOrigin(new Ammo.btVector3(2, 10, 0));
 
-      var myMotionState = new Ammo.btDefaultMotionState(startTransform),
+      const myMotionState = new Ammo.btDefaultMotionState(startTransform),
         rbInfo = new Ammo.btRigidBodyConstructionInfo(
           mass,
           myMotionState,
@@ -68,9 +68,9 @@ Ammo().then(function (Ammo) {
       bodies.push(body);
     })();
 
-    var trans = new Ammo.btTransform(); // taking this out of the loop below us reduces the leaking
+    const trans = new Ammo.btTransform(); // taking this out of the loop below us reduces the leaking
 
-    for (var i = 0; i < 135; i++) {
+    for (let i = 0; i < 135; i++) {
       dynamicsWorld.stepSimulation(1 / 60, 10);
 
       bodies.forEach(function (body) {

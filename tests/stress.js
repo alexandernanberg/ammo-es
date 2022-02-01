@@ -3,12 +3,12 @@ const getClosureMapping = require('./helpers/get-closure-mapping.js');
 const loadAmmo = require('./helpers/load-ammo.js');
 
 // Initialize global Ammo once for all tests:
-test.before(async (t) => loadAmmo());
+test.before(async () => loadAmmo());
 
 test('stress', (t) => {
-  var TEST_MEMORY = 0;
+  const TEST_MEMORY = 0;
 
-  var readMemoryCeiling, malloc;
+  let readMemoryCeiling, malloc;
   if (TEST_MEMORY) {
     (function () {
       try {
@@ -18,8 +18,8 @@ test('stress', (t) => {
         };
         malloc = _malloc;
       } catch (e) {
-        var mapping = getClosureMapping();
-        var key = '0';
+        const mapping = getClosureMapping();
+        const key = '0';
         readMemoryCeiling = eval(
           '(function() { return ' +
             mapping['STATICTOP'] +
@@ -33,11 +33,11 @@ test('stress', (t) => {
   }
 
   function benchmark() {
-    var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
-    var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
-    var overlappingPairCache = new Ammo.btDbvtBroadphase();
-    var solver = new Ammo.btSequentialImpulseConstraintSolver();
-    var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(
+    const collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+    const dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+    const overlappingPairCache = new Ammo.btDbvtBroadphase();
+    const solver = new Ammo.btSequentialImpulseConstraintSolver();
+    const dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(
       dispatcher,
       overlappingPairCache,
       solver,
@@ -45,33 +45,33 @@ test('stress', (t) => {
     );
     dynamicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
 
-    var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
+    const groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
 
-    var bodies = [];
+    const bodies = [];
 
-    var groundTransform = new Ammo.btTransform();
+    const groundTransform = new Ammo.btTransform();
     groundTransform.setIdentity();
     groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
 
     (function () {
-      var mass = 0;
-      var localInertia = new Ammo.btVector3(0, 0, 0);
-      var myMotionState = new Ammo.btDefaultMotionState(groundTransform);
-      var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+      const mass = 0;
+      const localInertia = new Ammo.btVector3(0, 0, 0);
+      const myMotionState = new Ammo.btDefaultMotionState(groundTransform);
+      const rbInfo = new Ammo.btRigidBodyConstructionInfo(
         0,
         myMotionState,
         groundShape,
         localInertia
       );
-      var body = new Ammo.btRigidBody(rbInfo);
+      const body = new Ammo.btRigidBody(rbInfo);
 
       dynamicsWorld.addRigidBody(body);
       bodies.push(body);
     })();
 
-    var sphereShape = new Ammo.btSphereShape(1);
-    var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(1, 1, 1));
-    var coneShape = new Ammo.btConeShape(1, 1); // XXX TODO: add cylindershape too
+    const sphereShape = new Ammo.btSphereShape(1);
+    const boxShape = new Ammo.btBoxShape(new Ammo.btVector3(1, 1, 1));
+    const coneShape = new Ammo.btConeShape(1, 1); // XXX TODO: add cylindershape too
 
     [
       sphereShape,
@@ -83,40 +83,40 @@ test('stress', (t) => {
     ].forEach(function (shape, i) {
       t.log('creating dynamic shape ' + i);
 
-      var startTransform = new Ammo.btTransform();
+      const startTransform = new Ammo.btTransform();
       startTransform.setIdentity();
-      var mass = 1;
-      var localInertia = new Ammo.btVector3(0, 0, 0);
+      const mass = 1;
+      const localInertia = new Ammo.btVector3(0, 0, 0);
       shape.calculateLocalInertia(mass, localInertia);
 
       startTransform.setOrigin(
         new Ammo.btVector3(2 + i * 0.01, 10 + i * 2.1, 0)
       );
 
-      var myMotionState = new Ammo.btDefaultMotionState(startTransform);
-      var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+      const myMotionState = new Ammo.btDefaultMotionState(startTransform);
+      const rbInfo = new Ammo.btRigidBodyConstructionInfo(
         mass,
         myMotionState,
         shape,
         localInertia
       );
-      var body = new Ammo.btRigidBody(rbInfo);
+      const body = new Ammo.btRigidBody(rbInfo);
 
       dynamicsWorld.addRigidBody(body);
       bodies.push(body);
     });
 
-    var memoryStart;
+    let memoryStart;
 
-    var trans = new Ammo.btTransform(); // taking this out of the loop below us reduces the leaking
+    const trans = new Ammo.btTransform(); // taking this out of the loop below us reduces the leaking
 
-    var startTime = Date.now();
+    const startTime = Date.now();
 
     if (TEST_MEMORY) malloc(5 * 1024 * 1024); // stress memory usage
 
-    var NUM = 150000;
+    const NUM = 150000;
 
-    for (var i = 0; i < NUM; i++) {
+    for (let i = 0; i < NUM; i++) {
       if (i === 250 && TEST_MEMORY) memoryStart = readMemoryCeiling();
 
       dynamicsWorld.stepSimulation(1 / 60, 10);
@@ -138,7 +138,7 @@ test('stress', (t) => {
       });
     }
 
-    var endTime = Date.now();
+    const endTime = Date.now();
 
     if (TEST_MEMORY)
       t.is(
@@ -151,10 +151,10 @@ test('stress', (t) => {
   }
 
   function testDestroy() {
-    var NUM = 1000; // enough to force an increase in the memory ceiling
-    var vec = new Ammo.btVector3(4, 5, 6);
-    var memoryStart = readMemoryCeiling();
-    for (var i = 0; i < NUM; i++) {
+    const NUM = 1000; // enough to force an increase in the memory ceiling
+    let vec = new Ammo.btVector3(4, 5, 6);
+    const memoryStart = readMemoryCeiling();
+    for (let i = 0; i < NUM; i++) {
       Ammo.destroy(vec);
       vec = new Ammo.btVector3(4, 5, 6);
     }
@@ -164,7 +164,7 @@ test('stress', (t) => {
       memoryStart,
       'Memory ceiling must remain stable!'
     );
-    for (var i = 0; i < NUM; i++) {
+    for (let i = 0; i < NUM; i++) {
       vec = new Ammo.btVector3(4, 5, 6);
     }
     t.not(

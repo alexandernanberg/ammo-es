@@ -14,12 +14,17 @@
   "homepage": "https://github.com/alexandernanberg/ammo-es",
   "devDependencies": {
     "ava": "^3.11.0",
+    "eslint": "^8.8.0",
+    "eslint-config-alexandernanberg": "^3.2.1",
     "http-server": "^0.12.3",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "webidl2ts": "^1.0.4"
   },
   "scripts": {
     "test": "npm run test-js && npm run test-wasm",
     "test-js": "AMMO_PATH=builds/ammo.js ava",
-    "test-wasm": "AMMO_PATH=builds/ammo.wasm.js ava"
+    "test-wasm": "AMMO_PATH=builds/ammo.wasm.js ava",
+    "ts:module": "webidl2ts -i ./ammo.idl -o ./builds/ammo.d.ts -ed -n Ammo",
+    "ts:ambient": "webidl2ts -i ./ammo.idl -o ./builds/ammoo.d.ts -e -n Ammo"
   }
 }

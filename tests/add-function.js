@@ -6,7 +6,7 @@ const loadAmmo = require('./helpers/load-ammo.js');
 const CF_CUSTOM_MATERIAL_CALLBACK = 8;
 
 // Load global Ammo once for all tests:
-test.before(async (t) => await loadAmmo());
+test.before(async () => await loadAmmo());
 
 // Test contact callbacks serially:
 // Each btManifoldResult callback is a global extern in bullet, however ammo
@@ -53,14 +53,14 @@ testContactCallback(
         colObj0Wrap,
         Ammo.btCollisionObjectWrapper
       );
-      colObj0 = colObj0Wrap.getCollisionObject();
+      const colObj0 = colObj0Wrap.getCollisionObject();
       t.assert(Ammo.compare(colObj0, bodyA));
 
       colObj1Wrap = Ammo.wrapPointer(
         colObj1Wrap,
         Ammo.btCollisionObjectWrapper
       );
-      colObj1 = colObj1Wrap.getCollisionObject();
+      const colObj1 = colObj1Wrap.getCollisionObject();
       t.assert(Ammo.compare(colObj1, bodyB));
 
       if (--expectedInvocations < 1) t.end();

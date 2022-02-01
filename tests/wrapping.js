@@ -2,16 +2,16 @@ const test = require('ava');
 const loadAmmo = require('./helpers/load-ammo.js');
 
 // Initialize global Ammo once for all tests:
-test.before(async (t) => loadAmmo());
+test.before(async () => loadAmmo());
 
 test('tests for caching, comparing, wrapping, etc.', (t) => {
-  var vec1 = new Ammo.btVector3(0, 0, 0);
-  var vec2 = new Ammo.btVector3(1, 3, 17);
+  const vec1 = new Ammo.btVector3(0, 0, 0);
+  const vec2 = new Ammo.btVector3(1, 3, 17);
   t.assert(Ammo.compare(vec1, vec1), 'Same');
   t.assert(Ammo.compare(vec2, vec2), 'Same');
   t.assert(!Ammo.compare(vec1, vec2), 'Different');
 
-  var vec3 = Ammo.wrapPointer(Ammo.getPointer(vec1), Ammo.btVector3);
+  const vec3 = Ammo.wrapPointer(Ammo.getPointer(vec1), Ammo.btVector3);
   t.assert(Ammo.compare(vec1, vec3), 'Cached, so same');
   t.is(Ammo.getPointer(vec1), Ammo.getPointer(vec3));
   t.is(vec1, vec3, 'Direct comparison should work, since the same class');
@@ -30,7 +30,7 @@ test('tests for caching, comparing, wrapping, etc.', (t) => {
 
   vec1.something = 55;
   t.is(vec1.something, 55, 'Just put there');
-  var vec1ptr = Ammo.getPointer(vec1);
+  const vec1ptr = Ammo.getPointer(vec1);
   t.is(Ammo.wrapPointer(vec1ptr, Ammo.btVector3), vec1, 'Same object in cache');
   t.is(
     Ammo.wrapPointer(vec1ptr, Ammo.btVector3).something,
@@ -56,32 +56,31 @@ test('tests for caching, comparing, wrapping, etc.', (t) => {
 
   // Upcasting
   (function () {
-    var groundTransform = new Ammo.btTransform();
+    const groundTransform = new Ammo.btTransform();
     groundTransform.setIdentity();
     groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
-    var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
+    const groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
 
-    var mass = 0;
-    var localInertia = new Ammo.btVector3(0, 0, 0);
-    var myMotionState = new Ammo.btDefaultMotionState(groundTransform);
-    var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+    const localInertia = new Ammo.btVector3(0, 0, 0);
+    const myMotionState = new Ammo.btDefaultMotionState(groundTransform);
+    const rbInfo = new Ammo.btRigidBodyConstructionInfo(
       0,
       myMotionState,
       groundShape,
       localInertia
     );
-    var body = new Ammo.btRigidBody(rbInfo);
+    const body = new Ammo.btRigidBody(rbInfo);
     body.info = 1230;
     t.is(Ammo.getClass(body), Ammo.btRigidBody);
     t.is(body.info, 1230);
 
-    var asCollision = Ammo.castObject(body, Ammo.btCollisionObject);
+    const asCollision = Ammo.castObject(body, Ammo.btCollisionObject);
     t.not(asCollision.info, 1230);
     t.is(Ammo.getClass(asCollision), Ammo.btCollisionObject);
     t.not(body, asCollision, 'Not the same yet - different class');
     t.assert(Ammo.compare(body, asCollision), 'But has the same pointer');
 
-    var upcasted = Ammo.castObject(asCollision, Ammo.btRigidBody);
+    const upcasted = Ammo.castObject(asCollision, Ammo.btRigidBody);
     t.is(
       body,
       upcasted,
@@ -89,7 +88,7 @@ test('tests for caching, comparing, wrapping, etc.', (t) => {
     );
     t.is(upcasted.info, 1230);
 
-    var upcastUpcasted = Ammo.btRigidBody.prototype.upcast(asCollision);
+    const upcastUpcasted = Ammo.btRigidBody.prototype.upcast(asCollision);
     t.is(
       body,
       upcastUpcasted,
@@ -103,9 +102,9 @@ test('tests for caching, comparing, wrapping, etc.', (t) => {
 
   // not supported in asm
   (function () {
-    var calledBack = false;
-    var callback = new Ammo.ConcreteContactResultCallback();
-    callback.addSingleResult = function (cp, etc) {
+    let calledBack = false;
+    const callback = new Ammo.ConcreteContactResultCallback();
+    callback.addSingleResult = function () {
       calledBack = true;
     };
     t.assert(!calledBack);

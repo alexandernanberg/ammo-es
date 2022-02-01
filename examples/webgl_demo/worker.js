@@ -1,10 +1,10 @@
-
-var Module = { TOTAL_MEMORY: 512*1024*1024 };
+var Module = { TOTAL_MEMORY: 512 * 1024 * 1024 };
 
 importScripts('../../builds/ammo.js');
 
-Ammo().then(function(Ammo) {
-  var NUM = 0, NUMRANGE = [];
+Ammo().then(function (Ammo) {
+  var NUM = 0,
+    NUMRANGE = [];
 
   // Bullet-interfacing code
 
@@ -12,7 +12,12 @@ Ammo().then(function(Ammo) {
   var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
   var overlappingPairCache = new Ammo.btDbvtBroadphase();
   var solver = new Ammo.btSequentialImpulseConstraintSolver();
-  var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+  var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(
+    dispatcher,
+    overlappingPairCache,
+    solver,
+    collisionConfiguration
+  );
   dynamicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
 
   var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
@@ -23,11 +28,16 @@ Ammo().then(function(Ammo) {
   groundTransform.setIdentity();
   groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
 
-  (function() {
+  (function () {
     var mass = 0;
     var localInertia = new Ammo.btVector3(0, 0, 0);
     var myMotionState = new Ammo.btDefaultMotionState(groundTransform);
-    var rbInfo = new Ammo.btRigidBodyConstructionInfo(0, myMotionState, groundShape, localInertia);
+    var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+      0,
+      myMotionState,
+      groundShape,
+      localInertia
+    );
     var body = new Ammo.btRigidBody(rbInfo);
 
     dynamicsWorld.addRigidBody(body);
@@ -37,7 +47,7 @@ Ammo().then(function(Ammo) {
   var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(1, 1, 1));
 
   function resetPositions() {
-    var side = Math.ceil(Math.pow(NUM, 1/3));
+    var side = Math.ceil(Math.pow(NUM, 1 / 3));
     var i = 1;
     for (var x = 0; x < side; x++) {
       for (var y = 0; y < side; y++) {
@@ -45,9 +55,9 @@ Ammo().then(function(Ammo) {
           if (i == bodies.length) break;
           var body = bodies[i++];
           var origin = body.getWorldTransform().getOrigin();
-          origin.setX((x - side/2)*(2.2 + Math.random()));
+          origin.setX((x - side / 2) * (2.2 + Math.random()));
           origin.setY(y * (3 + Math.random()));
-          origin.setZ((z - side/2)*(2.2 + Math.random()) - side - 3);
+          origin.setZ((z - side / 2) * (2.2 + Math.random()) - side - 3);
           body.activate();
           var rotation = body.getWorldTransform().getRotation();
           rotation.setX(1);
@@ -60,7 +70,7 @@ Ammo().then(function(Ammo) {
   }
 
   function startUp() {
-    NUMRANGE.forEach(function(i) {
+    NUMRANGE.forEach(function (i) {
       var startTransform = new Ammo.btTransform();
       startTransform.setIdentity();
       var mass = 1;
@@ -68,7 +78,12 @@ Ammo().then(function(Ammo) {
       boxShape.calculateLocalInertia(mass, localInertia);
 
       var myMotionState = new Ammo.btDefaultMotionState(startTransform);
-      var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, myMotionState, boxShape, localInertia);
+      var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+        mass,
+        myMotionState,
+        boxShape,
+        localInertia
+      );
       var body = new Ammo.btRigidBody(rbInfo);
 
       dynamicsWorld.addRigidBody(body);
@@ -95,7 +110,8 @@ Ammo().then(function(Ammo) {
   }
 
   var nextTimeToRestart = 0;
-  function timeToRestart() { // restart if at least one is inactive - the scene is starting to get boring
+  function timeToRestart() {
+    // restart if at least one is inactive - the scene is starting to get boring
     if (nextTimeToRestart) {
       if (Date.now() >= nextTimeToRestart) {
         nextTimeToRestart = 0;
@@ -113,7 +129,9 @@ Ammo().then(function(Ammo) {
     return false;
   }
 
-  var meanDt = 0, meanDt2 = 0, frame = 1;
+  var meanDt = 0,
+    meanDt2 = 0,
+    frame = 1;
 
   function simulate(dt) {
     dt = dt || 1;
@@ -122,21 +140,25 @@ Ammo().then(function(Ammo) {
 
     var alpha;
     if (meanDt > 0) {
-      alpha = Math.min(0.1, dt/1000);
+      alpha = Math.min(0.1, dt / 1000);
     } else {
       alpha = 0.1; // first run
     }
-    meanDt = alpha*dt + (1-alpha)*meanDt;
+    meanDt = alpha * dt + (1 - alpha) * meanDt;
 
-    var alpha2 = 1/frame++;
-    meanDt2 = alpha2*dt + (1-alpha2)*meanDt2;
+    var alpha2 = 1 / frame++;
+    meanDt2 = alpha2 * dt + (1 - alpha2) * meanDt2;
 
-    var data = { objects: [], currFPS: Math.round(1000/meanDt), allFPS: Math.round(1000/meanDt2) };
+    var data = {
+      objects: [],
+      currFPS: Math.round(1000 / meanDt),
+      allFPS: Math.round(1000 / meanDt2),
+    };
 
     // Read bullet data into JS objects
     for (var i = 0; i < NUM; i++) {
       var object = [];
-      readBulletObject(i+1, object);
+      readBulletObject(i + 1, object);
       data.objects[i] = object;
     }
 
@@ -147,10 +169,10 @@ Ammo().then(function(Ammo) {
 
   var interval = null;
 
-  onmessage = function(event) {
+  onmessage = function (event) {
     NUM = event.data;
     NUMRANGE.length = 0;
-    while (NUMRANGE.length < NUM) NUMRANGE.push(NUMRANGE.length+1);
+    while (NUMRANGE.length < NUM) NUMRANGE.push(NUMRANGE.length + 1);
 
     frame = 1;
     meanDt = meanDt2 = 0;
@@ -164,7 +186,7 @@ Ammo().then(function(Ammo) {
       last = now;
     }
     if (interval) clearInterval(interval);
-    interval = setInterval(mainLoop, 1000/60);
-  }
-  postMessage({isReady: true});
+    interval = setInterval(mainLoop, 1000 / 60);
+  };
+  postMessage({ isReady: true });
 });

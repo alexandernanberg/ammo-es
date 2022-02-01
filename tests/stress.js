@@ -3,23 +3,30 @@ const getClosureMapping = require('./helpers/get-closure-mapping.js');
 const loadAmmo = require('./helpers/load-ammo.js');
 
 // Initialize global Ammo once for all tests:
-test.before(async t => loadAmmo())
+test.before(async (t) => loadAmmo());
 
-test('stress', t => {
-
+test('stress', (t) => {
   var TEST_MEMORY = 0;
 
   var readMemoryCeiling, malloc;
   if (TEST_MEMORY) {
-    (function() {
+    (function () {
       try {
         STATICTOP;
-        readMemoryCeiling = function() { return STATICTOP + _sbrk.DATASIZE }
+        readMemoryCeiling = function () {
+          return STATICTOP + _sbrk.DATASIZE;
+        };
         malloc = _malloc;
-      } catch(e) {
+      } catch (e) {
         var mapping = getClosureMapping();
         var key = '0';
-        readMemoryCeiling = eval('(function() { return ' + mapping['STATICTOP'] + ' + ' + mapping['_sbrk$DATASIZE'] + ' })');
+        readMemoryCeiling = eval(
+          '(function() { return ' +
+            mapping['STATICTOP'] +
+            ' + ' +
+            mapping['_sbrk$DATASIZE'] +
+            ' })'
+        );
         malloc = eval(mapping['_malloc']);
       }
     })();
@@ -30,7 +37,12 @@ test('stress', t => {
     var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
     var overlappingPairCache = new Ammo.btDbvtBroadphase();
     var solver = new Ammo.btSequentialImpulseConstraintSolver();
-    var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+    var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(
+      dispatcher,
+      overlappingPairCache,
+      solver,
+      collisionConfiguration
+    );
     dynamicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
 
     var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
@@ -41,11 +53,16 @@ test('stress', t => {
     groundTransform.setIdentity();
     groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
 
-    (function() {
+    (function () {
       var mass = 0;
       var localInertia = new Ammo.btVector3(0, 0, 0);
       var myMotionState = new Ammo.btDefaultMotionState(groundTransform);
-      var rbInfo = new Ammo.btRigidBodyConstructionInfo(0, myMotionState, groundShape, localInertia);
+      var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+        0,
+        myMotionState,
+        groundShape,
+        localInertia
+      );
       var body = new Ammo.btRigidBody(rbInfo);
 
       dynamicsWorld.addRigidBody(body);
@@ -56,19 +73,33 @@ test('stress', t => {
     var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(1, 1, 1));
     var coneShape = new Ammo.btConeShape(1, 1); // XXX TODO: add cylindershape too
 
-    [sphereShape, boxShape, coneShape, boxShape, sphereShape, coneShape].forEach(function(shape, i) {
+    [
+      sphereShape,
+      boxShape,
+      coneShape,
+      boxShape,
+      sphereShape,
+      coneShape,
+    ].forEach(function (shape, i) {
       t.log('creating dynamic shape ' + i);
 
       var startTransform = new Ammo.btTransform();
       startTransform.setIdentity();
       var mass = 1;
       var localInertia = new Ammo.btVector3(0, 0, 0);
-      shape.calculateLocalInertia(mass,localInertia);
+      shape.calculateLocalInertia(mass, localInertia);
 
-      startTransform.setOrigin(new Ammo.btVector3(2+i*0.01, 10+i*2.1, 0));
+      startTransform.setOrigin(
+        new Ammo.btVector3(2 + i * 0.01, 10 + i * 2.1, 0)
+      );
 
       var myMotionState = new Ammo.btDefaultMotionState(startTransform);
-      var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
+      var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+        mass,
+        myMotionState,
+        shape,
+        localInertia
+      );
       var body = new Ammo.btRigidBody(rbInfo);
 
       dynamicsWorld.addRigidBody(body);
@@ -81,28 +112,42 @@ test('stress', t => {
 
     var startTime = Date.now();
 
-    if (TEST_MEMORY) malloc(5*1024*1024); // stress memory usage
+    if (TEST_MEMORY) malloc(5 * 1024 * 1024); // stress memory usage
 
     var NUM = 150000;
 
     for (var i = 0; i < NUM; i++) {
       if (i === 250 && TEST_MEMORY) memoryStart = readMemoryCeiling();
 
-      dynamicsWorld.stepSimulation(1/60, 10);
+      dynamicsWorld.stepSimulation(1 / 60, 10);
 
-      bodies.forEach(function(body, j) {
+      bodies.forEach(function (body, j) {
         if (body.getMotionState()) {
           body.getMotionState().getWorldTransform(trans);
-          if (i === NUM-1) t.log(j + ' : ' + [trans.getOrigin().x().toFixed(2), trans.getOrigin().y().toFixed(2), trans.getOrigin().z().toFixed(2)]);
+          if (i === NUM - 1)
+            t.log(
+              j +
+                ' : ' +
+                [
+                  trans.getOrigin().x().toFixed(2),
+                  trans.getOrigin().y().toFixed(2),
+                  trans.getOrigin().z().toFixed(2),
+                ]
+            );
         }
       });
     }
 
     var endTime = Date.now();
 
-    if (TEST_MEMORY) t.is(readMemoryCeiling(), memoryStart, 'Memory ceiling must remain stable!');
+    if (TEST_MEMORY)
+      t.is(
+        readMemoryCeiling(),
+        memoryStart,
+        'Memory ceiling must remain stable!'
+      );
 
-    t.log('total time: ' + ((endTime-startTime)/1000).toFixed(3));
+    t.log('total time: ' + ((endTime - startTime) / 1000).toFixed(3));
   }
 
   function testDestroy() {
@@ -114,14 +159,22 @@ test('stress', t => {
       vec = new Ammo.btVector3(4, 5, 6);
     }
     Ammo.destroy(vec);
-    t.is(readMemoryCeiling(), memoryStart, 'Memory ceiling must remain stable!');
+    t.is(
+      readMemoryCeiling(),
+      memoryStart,
+      'Memory ceiling must remain stable!'
+    );
     for (var i = 0; i < NUM; i++) {
       vec = new Ammo.btVector3(4, 5, 6);
     }
-    t.not(readMemoryCeiling(), memoryStart, 'Memory ceiling must increase without destroy()!');
+    t.not(
+      readMemoryCeiling(),
+      memoryStart,
+      'Memory ceiling must increase without destroy()!'
+    );
   }
 
   benchmark();
   if (TEST_MEMORY) testDestroy();
-  t.pass()
+  t.pass();
 });

@@ -1,20 +1,21 @@
 {
-  "name": "ammo.js",
-  "version": "0.0.2",
+  "name": "ammo-es",
+  "version": "0.0.1",
   "description": "Direct port of the Bullet physics engine to JavaScript using Emscripten",
   "main": "builds/ammo.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kripken/ammo.js.git"
+    "url": "git://github.com/alexandernanberg/ammo-es.git"
   },
   "author": "Alon Zakai <alonzakai@gmail.com>",
   "bugs": {
-    "url": "https://github.com/kripken/ammo.js/issues"
+    "url": "https://github.com/alexandernanberg/ammo-es/issues"
   },
-  "homepage": "https://github.com/kripken/ammo.js",
+  "homepage": "https://github.com/alexandernanberg/ammo-es",
   "devDependencies": {
     "ava": "^3.11.0",
-    "http-server": "^0.12.3"
+    "http-server": "^0.12.3",
+    "prettier": "^2.5.1"
   },
   "scripts": {
     "test": "npm run test-js && npm run test-wasm",

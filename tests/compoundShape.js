@@ -1,11 +1,10 @@
-const test = require('ava')
+const test = require('ava');
 const loadAmmo = require('./helpers/load-ammo.js');
 
 // Initialize global Ammo once for all tests:
-test.before(async t => loadAmmo())
+test.before(async (t) => loadAmmo());
 
-test('compound shape', t => {
-
+test('compound shape', (t) => {
   var compoundShape = new Ammo.btCompoundShape();
 
   var transform = new Ammo.btTransform();
@@ -13,7 +12,7 @@ test('compound shape', t => {
 
   var vec = new Ammo.btVector3();
   var quat = new Ammo.btQuaternion();
-  quat.setValue(0, 0, 0 , 1);
+  quat.setValue(0, 0, 0, 1);
 
   var margin = 0.01;
   var delta = 0.00001;
@@ -22,7 +21,7 @@ test('compound shape', t => {
   vec.setValue(0.5, 0.75, 1.25);
   var boxShape = new Ammo.btBoxShape(vec);
   boxShape.setMargin(margin);
-  t.assert(Math.abs(boxShape.getMargin() - margin) < delta, "boxShape margin" );
+  t.assert(Math.abs(boxShape.getMargin() - margin) < delta, 'boxShape margin');
   vec.setValue(0, 0, 0);
   transform.setOrigin(vec);
   transform.setRotation(quat);
@@ -33,7 +32,10 @@ test('compound shape', t => {
   var sphereShape = new Ammo.btSphereShape(sphereRadius);
   sphereShape.setMargin(margin);
   // Note: the sphere shape is different from the others, it always returns its radius as the margin.
-  t.assert(Math.abs(sphereShape.getMargin() - sphereRadius) < delta, "sphereShape margin must be equal to the radius" );
+  t.assert(
+    Math.abs(sphereShape.getMargin() - sphereRadius) < delta,
+    'sphereShape margin must be equal to the radius'
+  );
   vec.setValue(1, 0, 0);
   transform.setOrigin(vec);
   transform.setRotation(quat);
@@ -43,7 +45,10 @@ test('compound shape', t => {
   vec.setValue(0.3, 0.4, 0.3);
   var cylinderShape = new Ammo.btCylinderShape(vec);
   cylinderShape.setMargin(margin);
-  t.assert(Math.abs(cylinderShape.getMargin() - margin) < delta, "cylinderShape margin" );
+  t.assert(
+    Math.abs(cylinderShape.getMargin() - margin) < delta,
+    'cylinderShape margin'
+  );
   vec.setValue(-1, 0, 0);
   transform.setOrigin(vec);
   transform.setRotation(quat);
@@ -59,7 +64,10 @@ test('compound shape', t => {
   // Create capsule shape
   var capsuleShape = new Ammo.btCapsuleShape(0.4, 0.5);
   capsuleShape.setMargin(margin);
-  t.assert(Math.abs(capsuleShape.getMargin() - margin) < delta, "capsuleShape margin" );
+  t.assert(
+    Math.abs(capsuleShape.getMargin() - margin) < delta,
+    'capsuleShape margin'
+  );
   vec.setValue(0, -1, 0);
   transform.setOrigin(vec);
   transform.setRotation(quat);
@@ -77,25 +85,42 @@ test('compound shape', t => {
   convexHullShape.addPoint(vec);
   vec.setValue(0, -2, -1);
   convexHullShape.setMargin(margin);
-  t.assert(Math.abs(convexHullShape.getMargin() - margin) < delta, "convexHullShape margin" );
+  t.assert(
+    Math.abs(convexHullShape.getMargin() - margin) < delta,
+    'convexHullShape margin'
+  );
   transform.setOrigin(vec);
   transform.setRotation(quat);
   compoundShape.addChildShape(transform, convexHullShape);
 
   compoundShape.setMargin(margin);
-  t.assert(Math.abs(compoundShape.getMargin() - margin) < delta, "compoundShape margin" );
+  t.assert(
+    Math.abs(compoundShape.getMargin() - margin) < delta,
+    'compoundShape margin'
+  );
 
   // Test number of shapes
-  t.is(compoundShape.getNumChildShapes(), 6, "compoundShape.getNumChildShapes() should return 6")
+  t.is(
+    compoundShape.getNumChildShapes(),
+    6,
+    'compoundShape.getNumChildShapes() should return 6'
+  );
 
   // Create convex hull with ShapeHull
   vec.setValue(0.5, 0.75, 1.25);
   var boxShape = new Ammo.btBoxShape(vec);
   boxShape.setMargin(0);
   var shapeHull = new Ammo.btShapeHull(boxShape);
-  t.assert(shapeHull.buildHull(0), "shapeHull.buildHull should return true");
-  var convexHullShape = new Ammo.btConvexHullShape(shapeHull.getVertexPointer(), shapeHull.numVertices());
-  t.is(convexHullShape.getNumVertices(), 8, "convexHullShape.getNumVertices() should return 8");
+  t.assert(shapeHull.buildHull(0), 'shapeHull.buildHull should return true');
+  var convexHullShape = new Ammo.btConvexHullShape(
+    shapeHull.getVertexPointer(),
+    shapeHull.numVertices()
+  );
+  t.is(
+    convexHullShape.getNumVertices(),
+    8,
+    'convexHullShape.getNumVertices() should return 8'
+  );
 
   // Create rigid body
   vec.setValue(10, 5, 2);
@@ -104,7 +129,12 @@ test('compound shape', t => {
   var motionState = new Ammo.btDefaultMotionState(transform);
   var mass = 15;
   compoundShape.calculateLocalInertia(mass, vec);
-  var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, compoundShape, vec);
+  var rbInfo = new Ammo.btRigidBodyConstructionInfo(
+    mass,
+    motionState,
+    compoundShape,
+    vec
+  );
   var rigidBody = new Ammo.btRigidBody(rbInfo);
 
   // Set new motion state
@@ -115,10 +145,14 @@ test('compound shape', t => {
   rigidBody.setMotionState(newMotionState);
 
   // Destroy everything
-  for (var shapeIndex = compoundShape.getNumChildShapes() - 1; shapeIndex >= 0; shapeIndex--) {
-      var subShape = compoundShape.getChildShape(shapeIndex);
-      compoundShape.removeChildShapeByIndex(shapeIndex);
-      Ammo.destroy(subShape);
+  for (
+    var shapeIndex = compoundShape.getNumChildShapes() - 1;
+    shapeIndex >= 0;
+    shapeIndex--
+  ) {
+    var subShape = compoundShape.getChildShape(shapeIndex);
+    compoundShape.removeChildShapeByIndex(shapeIndex);
+    Ammo.destroy(subShape);
   }
 
   Ammo.destroy(rigidBody.getCollisionShape());

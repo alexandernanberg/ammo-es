@@ -2,11 +2,13 @@ const test = require('ava');
 const loadAmmo = require('./helpers/load-ammo.js');
 
 // Initialize global Ammo once for all tests:
-test.before(async t => loadAmmo())
+test.before(async (t) => loadAmmo());
 
-test('ClosestRayResultCallback', t => {
-
-  var rayCallback = new Ammo.ClosestRayResultCallback(new Ammo.btVector3(0, 0, 0), new Ammo.btVector3(1, 3, 17));
+test('ClosestRayResultCallback', (t) => {
+  var rayCallback = new Ammo.ClosestRayResultCallback(
+    new Ammo.btVector3(0, 0, 0),
+    new Ammo.btVector3(1, 3, 17)
+  );
   t.log(rayCallback.hasHit());
 
   // Test setters/getters
